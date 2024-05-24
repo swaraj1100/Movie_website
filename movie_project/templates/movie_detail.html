@@ -1,0 +1,224 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Movie Detail</title>
+
+    <!-- CSS FILES -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;700;900&display=swap" rel="stylesheet">
+    <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/css/bootstrap-icons.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'assets/css/slick.css' %}">
+    <link href="{% static 'assets/css/tooplate-little-fashion.css' %}" rel="stylesheet">
+
+    <style>
+        .star-rating {
+            direction: rtl;
+            display: inline-block;
+            font-size: 24px;
+            unicode-bidi: bidi-override;
+        }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            color: #ddd;
+            font-size: 30px;
+            padding: 0 5px;
+            cursor: pointer;
+        }
+
+        .star-rating input:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #f5b301;
+        }
+
+        .star-rating-display {
+            font-size: 24px;
+            color: #f5b301;
+        }
+
+        .comment-box {
+            background-color: #f8f9fa;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <section class="preloader">
+        <div class="spinner">
+            <span class="sk-inner-circle"></span>
+        </div>
+    </section>
+
+    <main>
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+            <div class="d-flex">
+                <ul class="navbar-nav">
+                    <li class="nav-item"></li>
+
+                </ul>
+
+
+            </div>
+
+        </nav>
+        <section class="products section-padding">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h4 class="mb-5"> <span>Movie</span> Details</h4>
+                    </div>
+                    <div class="mb-5">
+                        <a href="{% url 'movie_list' %}" class="btn btn-secondary">Back</a>
+                    </div>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <img src="{{ movie.poster.url }}" width="300" height="400" alt="{{ movie.name }} Poster" class="img-fluid">
+                            </div>
+                            <div class="col-md-6">
+                                <h2><b>{{ movie.name }}</b></h2>
+                                <p><strong>Actor:</strong> {{ movie.actors }}</p>
+                                <p><strong>Year:</strong> {{ movie.year }}</p>
+                                <p><strong>Category:</strong> {{ movie.category }}</p>
+                                <p><strong>Description:</strong> {{ movie.description }}</p>
+                                <p><strong>Trailer:</strong> <a href="{{ movie.youtube_link }}">{{ movie.youtube_link }}</a></p>
+                                {% if movie.uploaded_by == user %}
+                                    <a href="{% url 'edit_movie' movie.id %}" class="btn btn-warning">Edit</a>
+                                    <a href="{% url 'delete_movie' movie.pk %}" class="btn btn-danger">Delete</a>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h5>Rate this Movie</h5>
+                                {% if user.is_authenticated %}
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <div class="star-rating">
+                                            <input type="radio" id="5-stars" name="rating" value="5" />
+                                            <label for="5-stars" class="star">&#9733;</label>
+                                            <input type="radio" id="4-stars" name="rating" value="4" />
+                                            <label for="4-stars" class="star">&#9733;</label>
+                                            <input type="radio" id="3-stars" name="rating" value="3" />
+                                            <label for="3-stars" class="star">&#9733;</label>
+                                            <input type="radio" id="2-stars" name="rating" value="2" />
+                                            <label for="2-stars" class="star">&#9733;</label>
+                                            <input type="radio" id="1-star" name="rating" value="1" />
+                                            <label for="1-star" class="star">&#9733;</label>
+                                        </div>
+                                        <button type="submit" name="rate_movie" class="btn btn-primary mt-3">Submit Rating</button>
+                                    </form>
+                                {% else %}
+                                    <p>You must be logged in to rate this movie.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h5>Average Rating</h5>
+                                <div class="star-rating-display">
+                                    {% for i in "12345" %}
+                                        {% if i <= movie.average_rating|stringformat:"d" %}
+                                            &#9733;
+                                        {% else %}
+                                            &#9734;
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span>({{ movie.average_rating }} out of 5)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h6>Comments</h6>
+                                {% for comment in comments %}
+                                    <div class="comment-box">
+                                        <p><strong>{{ comment.user.username }}:</strong> {{ comment.content }}</p>
+                                        <p><small>Posted on {{ comment.created_at }}</small></p>
+                                    </div>
+                                {% empty %}
+                                    <p>No comments yet. Be the first to comment!</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                {% if user.is_authenticated %}
+                                    <h5>Leave a Comment</h5>
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        {{ comment_form.as_p }}
+                                        <button type="submit" name="comment_movie" class="btn btn-primary">Submit Comment</button>
+                                    </form>
+                                {% else %}
+                                    <p>You must be logged in to comment on this movie.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="site-footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-10 me-auto mb-4">
+                        <h4 class="text-white mb-3"><a href="/">SK Auction</a></h4>
+                        <p class="text-muted mt-lg-5 mb-4 mb-lg-0">&copy; 2022 <strong>SK Auction</strong></p>
+                        <p class="text-muted">Designed by <a href="#" target="_blank">Swaraj</a></p>
+                    </div>
+                    <div class="col-lg-5 col-8">
+                        <h5 class="text-white mb-3">Sitemap</h5>
+                        <ul class="footer-menu d-flex flex-wrap">
+                            <li class="footer-menu-item"><a href="#" class="footer-menu-link">Story</a></li>
+                            <li class="footer-menu-item"><a href="#" class="footer-menu-link">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-3 col-4">
+                        <h5 class="text-white mb-3">Social</h5>
+                        <ul class="social-icon">
+                            <li><a href="https://www.youtube.com/" class="social-icon-link bi-youtube"></a></li>
+                            <li><a href="https://wa.me/+917510449152" class="social-icon-link bi-whatsapp"></a></li>
+                            <li><a href="https://www.instagram.com/_s.4.k_?igsh=bWMydjFyam45ZG9t" class="social-icon-link bi-instagram"></a></li>
+                            <li><a href="https://join.skype.com/invite/qVJNiNgld3al" class="social-icon-link bi-skype"></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <!-- JAVASCRIPT FILES -->
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/Headroom.js' %}"></script>
+    <script src="{% static 'assets/js/jQuery.headroom.js' %}"></script>
+    <script src="{% static 'assets/js/slick.min.js' %}"></script>
+    <script src="{% static 'assets/js/custom.js' %}"></script>
+</body>
+</html>

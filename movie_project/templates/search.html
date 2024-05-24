@@ -1,0 +1,130 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Auction Website">
+    <meta name="author" content="Swaraj">
+    <title>Movies</title>
+
+    <!-- CSS FILES -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;700;900&display=swap" rel="stylesheet">
+    <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/css/bootstrap-icons.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/css/slick.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/css/tooplate-little-fashion.css' %}" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'movie_list' %}"><b>Movies</b></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <span class="nav-link">Hey {{ user.username }}</span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'add_movie' %}">Add Movie</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Catagories
+                            </a>
+                              <ul class="dropdown-menu">
+                                  {% for category in categories %}
+                                    <li><a class="dropdown-item" href=" ">{{category.name}}</a> </li>
+                                  {% endfor %}
+                              </ul>
+
+                        <li class="nav-item">
+                            <a href="{% url 'view_profile' %}" class="nav-link">View Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'edit_profile' %}" class="nav-link">Edit Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'logout' %}" class="nav-link">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-primary ms-2" href="{% url 'login' %}">Login</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                <form class="d-flex" role="search" action="{% url 'search_results' %}" method="GET">
+                    <input class="form-control me-2" type="search" name="q" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="products section-padding">
+        <div class="container">
+            <div class="row">
+                {% for movie in movies %}
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="card" style="width: 18rem;">
+                        <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.name }}" style="height: 300px; object-fit: cover;">
+                        <div class="card-body">
+                            <h7 class="card-title"><b>{{ movie.name }}</b></h7>
+                            <p class="card-text">{{ movie.category }}</p>
+                            <a href="{% url 'movie_detail' movie.id %}" class="btn btn-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-10 me-auto mb-4">
+                    <h4 class="text-white mb-3"><a href="">SK Movies</a></h4>
+                    <p class="copyright-text text-muted mt-lg-5 mb-4 mb-lg-0">Copyright © 2022 <strong>SK Movies</strong></p>
+                    <br>
+                    <p class="copyright-text">Designed by <a href="" target="_blank">Swaraj</a></p>
+                </div>
+                <div class="col-lg-5 col-8"></div>
+                <div class="col-lg-3 col-4">
+                    <h5 class="text-white mb-3">Social</h5>
+                    <ul class="social-icon">
+                        <li><a href="https://www.youtube.com/" class="social-icon-link bi-youtube"></a></li>
+                        <li><a href="https://wa.me/+917510449152" class="social-icon-link bi-whatsapp"></a></li>
+                        <li><a href="https://www.instagram.com/_s.4.k_?igsh=bWMydjFyam45ZG9t" class="social-icon-link bi-instagram"></a></li>
+                        <li><a href="https://join.skype.com/invite/qVJNiNgld3al" class="social-icon-link bi-skype"></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </footer>
+
+    <!-- JAVASCRIPT FILES -->
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/Headroom.js' %}"></script>
+    <script src="{% static 'assets/js/jQuery.headroom.js' %}"></script>
+    <script src="{% static 'assets/js/slick.min.js' %}"></script>
+    <script src="{% static 'assets/js/custom.js' %}"></script>
+</body>
+</html>
